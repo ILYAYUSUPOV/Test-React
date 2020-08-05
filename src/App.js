@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import Table from './Table/Table';
 import Loader from './Loader/Loader';
+import _ from 'lodash'
 
 class App extends Component{
 //loader
   state = {
     isLoading: true,
-    data: []
+    data: [],
+    sort: 'up',
+    sortField: 'id'
   }
 //Объемы данных и работа loader
   async componentDidMount() {
@@ -18,14 +21,29 @@ class App extends Component{
     })
   }
 //Реализация методов
-  onSort = (field) => {
-    console.log(field)
+  onSort = sortField => {
+    //Клонирование Массива для будущей сортировки
+    const clonedData = this.state.data.concat()
+    const sortType = this.state.sort === 'up' ? 'down' : 'up'
+
+    const orderedData = _.orderBy(clonedData, sortField, sortType);
+    this.setState({
+      data : orderedData,
+      sort : sortType,
+      sortField
+    })
   }
 //Передача методов компоненту
   render() {
     return (
       <div className="container">
-        {this.state.isLoading ? <Loader/> : <Table data={this.state.data} onSort={this.onSort}/>}
+        {this.state.isLoading 
+        ? <Loader/> 
+        : <Table data={
+          this.state.data} 
+          onSort={this.onSort} 
+          sort={this.state.sort} 
+          sortField={this.state.sortField}/>}
       </div>
   );
   }
